@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>Socket.io Begin</h1>
+    <ul id="messages"></ul>
+    <form action="">
+        <label for="">Message</label>
+        <input id='msg' type="text">
+        <button type="submit">Send</button>
+    </form>
+    <hr>
+    <div>
+        <input id="name" placeholder="Please enter ur name" />
+        <button onclick="confirm()">ยืนยัน</button>
+    </div>
+
+</body>
+
+<script>
+    var access = false;
+    const confirm = () => {
+        console.log('myfunc')
+        access = true;
+        $("#name").prop("disabled", true)
+    }
+    // function confirm(e) {
+    //     e.preventDefault();
+    //     console.log('myfunc')
+    //     access = true;
+    //     $("#name").prop("disabled", true)
+    // }
+    // เปิด Connection กับฝั่งเซิฟเวอร์
+    var socket = io();
+    // ส่งข้อมูลจาก Clinet ไปยังเซิฟเวอร์ (ver.hardcode)
+    // socket.emit('chat msg','hello world') // socket.emit('ชื่อ event','ข้อมูลที่ส่ง')
+    $('form').submit((e) => {
+        e.preventDefault();
+        if ($('#name').val() == '') {
+            alert("กรุณากรอกชื่อก่อนส่งข้อความด้วยค่ะ")
+            return undefined
+        }
+        if (access != true) {
+            alert("กรุณากดปุ่มยืนยันก่อนค่ะ")
+            return undefined
+        }
+        socket.emit('chat msg', { msg: $('#msg').val(), name: $('#name').val() })
+        $('#msg').val('')
+    })
+    socket.on('chat msg', (props) => {
+        $('#messages').append($('<li>').text(`${props.name} :` + props.msg));
+    })
+</script>
+
+</html>
